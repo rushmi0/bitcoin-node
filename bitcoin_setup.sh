@@ -57,10 +57,12 @@ import_public_keys() {
   echo "Importing public keys..."
   # ใช้คำสั่ง curl เพื่อดึงข้อมูลจาก URL ของคีย์สาธารณะ และนำมาค้นหา URL สำหรับดาวน์โหลด
   # จากนั้นใช้ grep เพื่อคัดเลือก URL ที่เกี่ยวข้องและนำไปใช้งานกับคำสั่ง curl เพื่อดาวน์โหลดคีย์
-  curl -s "https://api.github.com/repositories/355107265/contents/builder-keys" | grep download_url | grep -oE "https://[a-zA-Z0-9./-]+" | while read url; do
-                                                                                                          # ใช้คำสั่ง curl เพื่อดึงข้อมูลจาก URL และนำมานำเข้าคีย์โดยใช้ gpg
-                                                                                                          curl -s "$url" | gpg --import;
-                                                                                                        done
+  curl -s "https://api.github.com/repositories/355107265/contents/builder-keys" \
+     | grep download_url \
+     | grep -oE "https://[a-zA-Z0-9./-]+" | \
+     while read url; do
+       # ใช้คำสั่ง curl เพื่อดึงข้อมูลจาก URL และนำมานำเข้าคีย์โดยใช้ gpg
+       curl -s "$url" | gpg --import; done
  }
 
 # ฟังก์ชันนี้ใช้สำหรับการยืนยันลายเซ็น
