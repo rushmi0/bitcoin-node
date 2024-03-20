@@ -1,109 +1,142 @@
-#!/bin/bash
-
-# Function to download Bitcoin Core binary
+# ฟังก์ชันนี้ดาวน์โหลดโปรแกรม Bitcoin Core เวอร์ชันที่ระบุสำหรับแพลตฟอร์มที่ระบุ
 download_bitcoin_core() {
-    local VERSION="$1"
-    local PLATFORM="$2"
-    local FILENAME="bitcoin-$VERSION-$PLATFORM.tar.gz"
+  # นิยามตัวแปรภายในฟังก์ชัน
+  # - VERSION: เก็บเวอร์ชันของ Bitcoin Core ที่จะดาวน์โหลด (รับค่าจากพารามิเตอร์ $1)
+  # - PLATFORM: เก็บแพลตฟอร์มที่รองรับ (รับค่าจากพารามิเตอร์ $2)
+  # - FILENAME: สร้างชื่อไฟล์สำหรับไฟล์ดาวน์โหลด โดยประกอบด้วย เวอร์ชัน-แพลตฟอร์ม.tar.gz
+  local VERSION="$1"
+  local PLATFORM="$2"
+  local FILENAME="bitcoin-$VERSION-$PLATFORM.tar.gz"
 
-    echo "Downloading Bitcoin Core $VERSION for $PLATFORM..."
-    wget "https://bitcoincore.org/bin/bitcoin-core-$VERSION/$FILENAME"
+  # แสดงข้อความแจ้งการดาวน์โหลด Bitcoin Core เวอร์ชันที่ระบุสำหรับแพลตฟอร์มที่ระบุ
+  echo "Downloading Bitcoin Core $VERSION for $PLATFORM..."
+
+  # ใช้คำสั่ง wget เพื่อดาวน์โหลดไฟล์ Bitcoin Core จาก URL ที่สร้างขึ้น
+  wget "https://bitcoincore.org/bin/bitcoin-core-$VERSION/$FILENAME"
 }
 
-# Function to download cryptographic checksums
+# ฟังก์ชันนี้ดาวน์โหลดไฟล์ SHA256SUMS สำหรับเวอร์ชัน Bitcoin Core ที่ระบุ
 download_checksums() {
-    local VERSION="$1"
+  # นิยามตัวแปรภายในฟังก์ชัน
+  # - VERSION: เก็บเวอร์ชันของ Bitcoin Core ที่จะดาวน์โหลด (รับค่าจากพารามิเตอร์ $1)
+  local VERSION="$1"
 
-    echo "Downloading SHA256SUMS for Bitcoin Core $VERSION..."
-    wget "https://bitcoincore.org/bin/bitcoin-core-$VERSION/SHA256SUMS"
+  # แสดงข้อความแจ้งการดาวน์โหลดไฟล์ SHA256SUMS สำหรับ Bitcoin Core เวอร์ชันที่ระบุ
+  echo "Downloading SHA256SUMS for Bitcoin Core $VERSION..."
+
+  # ใช้คำสั่ง wget เพื่อดาวน์โหลดไฟล์ SHA256SUMS จาก URL ที่สร้างขึ้น
+  wget "https://bitcoincore.org/bin/bitcoin-core-$VERSION/SHA256SUMS"
 }
 
-# Function to download signatures
+# ฟังก์ชันนี้ดาวน์โหลดไฟล์ SHA256SUMS.asc สำหรับเวอร์ชัน Bitcoin Core ที่ระบุ
 download_signatures() {
-    local VERSION="$1"
+  # นิยามตัวแปรภายในฟังก์ชัน
+  # - VERSION: เก็บเวอร์ชันของ Bitcoin Core ที่จะดาวน์โหลด (รับค่าจากพารามิเตอร์ $1)
+  local VERSION="$1"
 
-    echo "Downloading SHA256SUMS.asc for Bitcoin Core $VERSION..."
-    wget "https://bitcoincore.org/bin/bitcoin-core-$VERSION/SHA256SUMS.asc"
+  # แสดงข้อความแจ้งการดาวน์โหลดไฟล์ SHA256SUMS.asc สำหรับ Bitcoin Core เวอร์ชันที่ระบุ
+  echo "Downloading SHA256SUMS.asc for Bitcoin Core $VERSION..."
+
+  # ใช้คำสั่ง wget เพื่อดาวน์โหลดไฟล์ SHA256SUMS.asc จาก URL ที่สร้างขึ้น
+  wget "https://bitcoincore.org/bin/bitcoin-core-$VERSION/SHA256SUMS.asc"
 }
 
-# Function to check checksums
+# ฟังก์ชันนี้ใช้คำนวณ checksum และเปรียบเทียบกับค่าที่อยู่ในไฟล์ SHA256SUMS
 checksum_check() {
-    echo "Performing checksum check..."
-    sha256sum --ignore-missing --check SHA256SUMS
+  # แสดงข้อความแจ้งการตรวจสอบ checksum
+  echo "Performing checksum check..."
+
+  # ใช้คำสั่ง sha256sum --ignore-missing --check SHA256SUMS เพื่อคำนวณ checksum
+  # ของไฟล์ทั้งหมดที่อยู่ในไฟล์ SHA256SUMS และเปรียบเทียบผลลัพธ์กับค่าที่อยู่ในไฟล์
+  sha256sum --ignore-missing --check SHA256SUMS
 }
 
-# Function to import public keys
+# ฟังก์ชันนี้นำเข้าคีย์สาธารณะ
 import_public_keys() {
-    echo "Importing public keys..."
-    curl -s "https://api.github.com/repositories/355107265/contents/builder-keys" | grep download_url | grep -oE "https://[a-zA-Z0-9./-]+" | while read url; do curl -s "$url" | gpg --import; done
-}
+  # แสดงข้อความแจ้งการนำเข้าคีย์สาธารณะ
+  echo "Importing public keys..."
+  # ใช้คำสั่ง curl เพื่อดึงข้อมูลจาก URL ของคีย์สาธารณะ และนำมาค้นหา URL สำหรับดาวน์โหลด
+  # จากนั้นใช้ grep เพื่อคัดเลือก URL ที่เกี่ยวข้องและนำไปใช้งานกับคำสั่ง curl เพื่อดาวน์โหลดคีย์
+  curl -s "https://api.github.com/repositories/355107265/contents/builder-keys" | grep download_url | grep -oE "https://[a-zA-Z0-9./-]+" | while read url; do
+                                                                                                          # ใช้คำสั่ง curl เพื่อดึงข้อมูลจาก URL และนำมานำเข้าคีย์โดยใช้ gpg
+                                                                                                          curl -s "$url" | gpg --import;
+                                                                                                        done
+ }
 
-# Function to verify signatures
+# ฟังก์ชันนี้ใช้สำหรับการยืนยันลายเซ็น
 verify_signatures() {
-    echo "Verifying signatures..."
-    gpg --verify SHA256SUMS.asc
+  # แสดงข้อความแจ้งการยืนยันลายเซ็น
+  echo "Verifying signatures..."
+  # ใช้ gpg เพื่อทำการยืนยันลายเซ็นของไฟล์ SHA256SUMS.asc
+  gpg --verify SHA256SUMS.asc
 }
 
-# Function to install Bitcoin Core binaries
+# ฟังก์ชันนี้ใช้สำหรับการติดตั้ง Bitcoin Core
 install_bitcoin_core() {
-    local VERSION="$1"
-    local PLATFORM="$2"
+  local VERSION="$1"
+  local PLATFORM="$2"
 
+  # แสดงข้อความแจ้งการติดตั้ง Bitcoin Core
+  echo "Installing Bitcoin Core $VERSION..."
 
-    echo "Installing Bitcoin Core $VERSION..."
-    tar -xvf "bitcoin-$VERSION-$PLATFORM.tar.gz"
+  # ใช้คำสั่ง tar เพื่อแตกไฟล์ Bitcoin Core
+  tar -xvf "bitcoin-$VERSION-$PLATFORM.tar.gz"
 
-     # Install each file individually
-    for file in "bitcoin-$VERSION/bin/"*; do
-        sudo install -m 0755 -o root -g root "$file" "/usr/local/bin/"
-    done
+  # ใช้ลูปเพื่อติดตั้งไฟล์ทั้งหมดที่อยู่ในไดเรกทอรี bin ของ Bitcoin Core ไปยัง /usr/local/bin/
+  for file in "bitcoin-$VERSION/bin/"*; do
+    sudo install -m 0755 -o root -g root "$file" "/usr/local/bin/"
+  done
 
-    bitcoind --version
+  # แสดงเวอร์ชันของ bitcoind หลังจากการติดตั้งเสร็จสมบูรณ์
+  bitcoind --version
 }
 
-# Function to clean up downloaded files
+# ฟังก์ชันนี้ใช้สำหรับการทำความสะอาดไฟล์
 cleanup_files() {
-    local VERSION="$1"
-    local PLATFORM="$2"
+  local VERSION="$1"
+  local PLATFORM="$2"
 
-    echo "Cleaning up downloaded files..."
-    rm "bitcoin-$VERSION-$PLATFORM.tar.gz"
-    rm "SHA256SUMS"
-    rm "SHA256SUMS.asc"
+  # แสดงข้อความแจ้งการทำความสะอาดไฟล์ที่ดาวน์โหลด
+  echo "Cleaning up downloaded files..."
+
+  # ใช้คำสั่ง rm เพื่อลบไฟล์ที่ดาวน์โหลดไว้
+  rm "bitcoin-$VERSION-$PLATFORM.tar.gz"
+  rm "SHA256SUMS"
+  rm "SHA256SUMS.asc"
 }
 
-# Main function
+# ฟังก์ชันหลักสำหรับการดำเนินการทั้งหมด
 main() {
-    local VERSION="26.0"
-    local PLATFORM=""
+  local VERSION="26.0"
+  local PLATFORM=""
 
-    # Allow user to select Bitcoin Core version
-    echo "Available Bitcoin Core versions:"
-    echo "> Bitcoin Core 26.0"
+  # แสดงข้อความเวอร์ชัน Bitcoin Core ที่สามารถใช้งานได้
+  echo "Available Bitcoin Core versions:"
+  echo "> Bitcoin Core 26.0"
 
-    # Determine platform
-    if [[ $(uname -m) == "x86_64" ]]; then
-        PLATFORM="x86_64-linux-gnu"
-    elif [[ $(uname -m) == "arm"* ]]; then
-        PLATFORM="aarch64-linux-gnu"
-    else
-        echo "Unsupported CPU architecture."
-        exit 1
-    fi
+  # ตรวจสอบและกำหนดแพลตฟอร์มของระบบปฏิบัติการ
+  if [[ $(uname -m) == "x86_64" ]]; then
+    PLATFORM="x86_64-linux-gnu"
+  elif [[ $(uname -m) == "arm"* ]]; then
+    PLATFORM="aarch64-linux-gnu"
+  else
+    echo "Unsupported CPU architecture."
+    exit 1
+  fi
 
-    # Perform actions
-    download_bitcoin_core "$VERSION" "$PLATFORM"
-    download_checksums "$VERSION"
-    download_signatures "$VERSION"
-    checksum_check
-    import_public_keys
-    verify_signatures
-    install_bitcoin_core "$VERSION" "$PLATFORM"
-    cleanup_files "$VERSION" "$PLATFORM"
+  # เรียกใช้ฟังก์ชันต่าง ๆ เพื่อดำเนินการตามขั้นตอนการติดตั้ง Bitcoin Core
+  download_bitcoin_core "$VERSION" "$PLATFORM"
+  download_checksums "$VERSION"
+  download_signatures "$VERSION"
+  checksum_check
+  import_public_keys
+  verify_signatures
+  install_bitcoin_core "$VERSION" "$PLATFORM"
+  cleanup_files "$VERSION" "$PLATFORM"
 
-    echo "Bitcoin Core setup completed successfully."
+  # แสดงข้อความเมื่อการติดตั้งเสร็จสมบูรณ์
+  echo "Bitcoin Core setup completed successfully."
 }
 
-# Execute main function
+# เรียกใช้ฟังก์ชันหลัก
 main
-
