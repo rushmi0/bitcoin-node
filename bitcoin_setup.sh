@@ -59,8 +59,8 @@ import_public_keys() {
   # จากนั้นใช้ grep เพื่อคัดเลือก URL ที่เกี่ยวข้องและนำไปใช้งานกับคำสั่ง curl เพื่อดาวน์โหลดคีย์
   curl -s "https://api.github.com/repositories/355107265/contents/builder-keys" \
      | grep download_url \
-     | grep -oE "https://[a-zA-Z0-9./-]+" | \
-     while read url; do
+     | grep -oE "https://[a-zA-Z0-9./-]+" \
+     | while read url; do
        # ใช้คำสั่ง curl เพื่อดึงข้อมูลจาก URL และนำมานำเข้าคีย์โดยใช้ gpg
        curl -s "$url" | gpg --import; done
  }
