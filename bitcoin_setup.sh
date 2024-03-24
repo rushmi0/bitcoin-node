@@ -138,6 +138,8 @@ main() {
 
   # แสดงข้อความเมื่อการติดตั้งเสร็จสมบูรณ์
   echo "Bitcoin Core setup completed successfully."
+
+  # /usr/local/bin/bitcoin-qt
 }
 
 # เรียกใช้ฟังก์ชันหลัก
